@@ -856,6 +856,7 @@ class Fit(sc.prettyobj):
             actual    = sc.dcp(self.pair[key].data)
             predicted = sc.dcp(self.pair[key].sim)
             self.gofs[key] = cvm.compute_gof(actual, predicted, **kwargs)
+            print(self.pair.keys())
         return
 
 
