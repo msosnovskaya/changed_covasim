@@ -133,16 +133,24 @@ def create_subplots(figs, fig, shareax, n_rows, n_cols, pnum, fig_args, sep_figs
     return ax
 
 
-def plot_data(sim, ax, key, scatter_args,dday=None, color=None):
+def plot_data(sim, ax, key, scatter_args, test_data=None, dday=None,color=None):
     ''' Add data to the plot '''
     if sim.data is not None and key in sim.data and len(sim.data[key]):
         if color is None:
             color = sim.results[key].color
         data_t = (sim.data.index-sim['start_day'])/np.timedelta64(1,'D') # Convert from data date to model output index based on model start date
         if dday is not None:
-            ax.scatter(data_t[-dday:], sim.data[key][-dday:], c=[color], label='Data', **scatter_args)
+            if test_data is not None:
+                ax.scatter(data_t[-dday:-test_data], sim.data[key][-dday:-test_data], c=[color], label='Model data', **scatter_args)
+                ax.scatter(data_t[-test_data:], sim.data[key][-test_data:], c='black', label='Test data', **scatter_args)
+            else:
+                ax.scatter(data_t[-dday:], sim.data[key][-dday:], c=[color], label='Data', **scatter_args)
         else:
-            ax.scatter(data_t, sim.data[key], c=[color], label='Data', **scatter_args)
+            if test_data is not None:
+                ax.scatter(data_t[:-test_data], sim.data[key][:-test_data], c=[color], label='Model data', **scatter_args)
+                ax.scatter(data_t[-test_data:], sim.data[key][-test_data:], c='black', label='Test data', **scatter_args)
+            else:    
+                ax.scatter(data_t, sim.data[key], c=[color], label='Data', **scatter_args)
 
     return
 
