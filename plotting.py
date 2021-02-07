@@ -133,7 +133,19 @@ def create_subplots(figs, fig, shareax, n_rows, n_cols, pnum, fig_args, sep_figs
     return ax
 
 
-def plot_data(sim, ax, key, scatter_args, test_data=None, dday=None,color=None):
+# def plot_data(sim, ax, key, scatter_args,dday=None, color=None):
+#     ''' Add data to the plot '''
+#     if sim.data is not None and key in sim.data and len(sim.data[key]):
+#         if color is None:
+#             color = sim.results[key].color
+#         data_t = (sim.data.index-sim['start_day'])/np.timedelta64(1,'D') # Convert from data date to model output index based on model start date
+#         if dday is not None:
+#             ax.scatter(data_t[-dday:], sim.data[key][-dday:], c=[color], label='Data', **scatter_args)
+#         else:
+#             ax.scatter(data_t, sim.data[key], c=[color], label='Data', **scatter_args)
+
+#     return
+def plot_data(sim, ax, key, scatter_args, test_data=None, dday=None, color=None):
     ''' Add data to the plot '''
     if sim.data is not None and key in sim.data and len(sim.data[key]):
         if color is None:
@@ -264,7 +276,7 @@ def set_line_options(input_args, reskey, resnum, default):
 def smooth(y, sigma=3):
     return sp.ndimage.gaussian_filter1d(y, sigma=sigma)
 
-def plot_sim(sim, dday=None, to_plot=None, do_save=None, fig_path=None, fig_args=None, plot_args=None,
+def plot_sim(sim, dday=None, test_data=None, to_plot=None, do_save=None, fig_path=None, fig_args=None, plot_args=None,
          scatter_args=None, axis_args=None, fill_args=None, legend_args=None, show_args=None,
          as_dates=True, dateformat=None, interval=None, n_cols=None, font_size=18, font_family=None,
          grid=False, commaticks=True, setylim=True, log_scale=False, colors=None, labels=None,
@@ -294,7 +306,7 @@ def plot_sim(sim, dday=None, to_plot=None, do_save=None, fig_path=None, fig_args
                     ax.fill_between(res_t, smooth(res.low), smooth(res.high), color=color, **args.fill) # Create the uncertainty bound
                 ax.plot(res_t, smooth(res.values), label=label, **args.plot, c=color) 
             if args.show['data']:
-                plot_data(sim, ax, reskey, args.scatter, dday=dday, color=color) # Plot the data
+                plot_data(sim, ax, reskey, args.scatter, dday=dday, test_data=test_data, color=color) # Plot the data
             if args.show['ticks']:
                 reset_ticks(ax, sim, interval, as_dates, dateformat) # Optionally reset tick marks (useful for e.g. plotting weeks/months)
         if args.show['interventions']:
