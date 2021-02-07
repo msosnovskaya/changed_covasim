@@ -181,7 +181,7 @@ class MultiSim(sc.prettyobj):
         return
 
 
-    def reduce(self, quantiles=None, output=False):
+    def reduce(self, quantiles=None, output=False, low_high=False):
         ''' Combine multiple sims into a single sim with scaled results '''
 
         if quantiles is None:
@@ -226,7 +226,10 @@ class MultiSim(sc.prettyobj):
         if output:
             return self.base_sim
         else:
-            return
+            if low_high:
+            	return reduced_sim.results['new_diagnoses'].low, reduced_sim.results['new_diagnoses'].high
+            else: 
+            	return
 
 
     def combine(self, output=False):
