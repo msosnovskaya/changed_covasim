@@ -318,7 +318,7 @@ def plot_sim(sim, dday=None, test_data=None, to_plot=None, do_save=None, fig_pat
 
 
 
-def plot_scens(dday, scens, to_plot=None, do_save=None, fig_path=None, fig_args=None, plot_args=None,
+def plot_scens(scens, data_check=None, dday=None, test_data=None, to_plot=None, do_save=None, fig_path=None, fig_args=None, plot_args=None,
          scatter_args=None, axis_args=None, fill_args=None, legend_args=None, show_args=None,
          as_dates=True, dateformat=None, interval=None, n_cols=None, font_size=18, font_family=None,
          grid=False, commaticks=True, setylim=True, log_scale=False, colors=None, labels=None,
@@ -329,7 +329,7 @@ def plot_scens(dday, scens, to_plot=None, do_save=None, fig_path=None, fig_args=
     args = handle_args(fig_args, plot_args, scatter_args, axis_args, fill_args, legend_args)
     to_plot, n_cols, n_rows = handle_to_plot('scens', to_plot, n_cols, sim=scens.base_sim)
     fig, figs, ax = create_figs(args, font_size, font_family, sep_figs, fig)
-
+    was_plot=False
     # Do the plotting
     default_colors = sc.gridcolors(ncolors=len(scens.sims))
     for pnum,title,reskeys in to_plot.enumitems():
@@ -348,16 +348,21 @@ def plot_scens(dday, scens, to_plot=None, do_save=None, fig_path=None, fig_args=
                 else:
                     ax.fill_between(scens.tvec, smooth(scendata.low), smooth(scendata.high), color=color, **args.fill) # Create the uncertainty bound
                     ax.plot(scens.tvec, smooth(res_y), label=label, c=color, **args.plot)
-                if args.show['data']:
-                    plot_data(sim, ax, reskey, args.scatter,dday=dday, color=color) # Plot the data
+                if data_check is not None and not was_plot:
+                    ax.scatter(range(data_check.index.size), data_check[reskey], label='Data')
+                    was_plot=True
+                elif data_check is None:
+                    if args.show['data']:
+                        plot_data(sim, ax, reskey, args.scatter, dday=dday, test_data=test_data, color=color) # Plot the data
                 if args.show['interventions']:
-                    plot_interventions(sim, ax,dday=dday) # Plot the interventions
+                    plot_interventions(sim, ax) # Plot the interventions
                 if args.show['ticks']:
                     reset_ticks(ax, sim, interval, as_dates, dateformat) # Optionally reset tick marks (useful for e.g. plotting weeks/months)
         if args.show['legend']:
             title_grid_legend(ax, title, grid, commaticks, setylim, args.legend, pnum==0) # Configure the title, grid, and legend -- only show legend for first
 
     return tidy_up(fig, figs, sep_figs, do_save, fig_path, do_show)
+
 
 
 def plot_result(sim, key, fig_args=None, plot_args=None, axis_args=None, scatter_args=None,
@@ -789,3 +794,4 @@ def plotly_animate(sim, do_show=False):
         fig.show()
 
     return fig
+
